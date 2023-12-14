@@ -100,4 +100,4 @@ history = model.fit(x=x_train, y=y_train, batch_size=16, epochs=20, verbose=1,
 results = model.evaluate(x_test, y_test, batch_size=16)
 print("Test loss, Test accuracy:", results)
 
-#Test comment 1
+#Test 2
