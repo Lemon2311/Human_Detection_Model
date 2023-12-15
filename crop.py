@@ -36,7 +36,4 @@ def crop_and_save_images(input_folder, output_folder, target_size):
             print(f"Error processing {filename}: {e}")
 
 # Example usage:
-input_folder = "input_photos"
-output_folder = "output_photos"
-target_size = 700  # Set your desired target size here
-crop_and_save_images(input_folder, output_folder, target_size)
+crop_and_save_images("input_photos", "output_photos", 700)#input_folder, output_folder, target_size
