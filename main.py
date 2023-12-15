@@ -6,8 +6,7 @@ import os
 from tensorflow.keras.utils import to_categorical
 from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
 from sklearn.model_selection import train_test_split
-
-
+#from crop import crop_and_save_images // import crop_and_save_images from crop.py
 
 #creating datasets
 import cv2
