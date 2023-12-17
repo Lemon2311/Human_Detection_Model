@@ -1,101 +1,82 @@
 import numpy as np
-import tensorflow as tf
-import matplotlib.pyplot as plt
-from tensorflow.keras.datasets import mnist
 import os
-from tensorflow.keras.utils import to_categorical
-from tensorflow.keras.layers import Input, Conv2D, MaxPooling2D, Flatten, Dense
-from sklearn.model_selection import train_test_split
-#from crop import crop_and_save_images // import crop_and_save_images from crop.py
-#from take_photo import capture_photo // import capture_photo from take_photo.py
-
-#creating datasets
 import cv2
-#setting the path to the directory containing the pics
-# In this section create your own paths based on where you have stored the dataset
-path_home = 'C:/Users/888254/Documents/EXPO/EXPO_2023_2024/EXPO21/code'
-path_1 = 'C:/Users/888254/Documents/EXPO/EXPO_2023_2024/EXPO21/code/human_detection_dataset/1'
-path_0 = 'C:/Users/888254/Documents/EXPO/EXPO_2023_2024/EXPO21/code/human_detection_dataset/0'
-
-# THIS CREATES NUMPY ARRAYS THAT STORE PHOTOS
-#appending the pics to the training data list
-#import os
-x_data_1 = [] # It contains the picture in the folder 1 (humans are present)
-for img in os.listdir(path_1):
-    if img.find('png')!=-1:
-        pic = cv2.imread(os.path.join(path_1,img))
-        pic = cv2.cvtColor(pic,cv2.COLOR_BGR2GRAY)
-        pic = cv2.resize(pic,(80,80))
-        x_data_1.append([pic])
-# and it will save them into an array file called features.npy
-np.save(os.path.join(path_1,'features'),np.array(x_data_1))   
-#loading the saved file once again and store it in x_data_1_p
-x_data_1_np = np.load(os.path.join(path_1,'features.npy')) 
-
-#appending the pics to the training data list
-x_data_0 = [] # It contains the picture in the folder 1 (humans are not present)
-for img in os.listdir(path_0):
-    if img.find('png')!=-1:
-        pic = cv2.imread(os.path.join(path_0,img))
-        #pic = cv2.cvtColor(pic,cv2.COLOR_BGR2RGB)
-        #pic = cv2.cvtColor(pic,cv2.COLOR_BGR2RGB)
-        pic = cv2.cvtColor(pic,cv2.COLOR_BGR2GRAY)
-        pic = cv2.resize(pic,(80,80))
-        x_data_0.append([pic])
-# and it will save them into an array file called features.npy
-np.save(os.path.join(path_1,'features'),np.array(x_data_0))   
-#loading the saved file once again and store it in x_data_0_p
-x_data_0_np = np.load(os.path.join(path_1,'features.npy'))  
-
-# YOU CAN PRINT ANY IMAGE STOREd EITHER IN x_data_0_np and x_data_1_np
-# THIS IS JUST AN EXAMPLE TO VISUALIZE IMAGES INSIDE DATASET
-plt.imshow(x_data_1_np[0,0,:,:])
-plt.show()
-
-
-#This concatenate both images with humans and images without humans
-x_data = np.concatenate((x_data_1_np,x_data_0_np), axis=0)
-x_data = x_data.reshape(x_data.shape[0],x_data.shape[-1],x_data.shape[-1],1)
-
-#This generates the labes, where 1 = Humans and 0 = Non humans
-y_data_1 = np.ones(np.shape(x_data_1)[0])
-y_data_0 = np.zeros(np.shape(x_data_0)[0])
-y_data = np.concatenate((y_data_1,y_data_0), axis=0)
-
-#This generates dataset
+from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
-x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=42)
+import tensorflow as tf
 
+# Function to process and load images
+def load_and_process_images(path):
+    x_data = [] 
+    for img in os.listdir(path):
+        if img.endswith('png'):
+            pic = cv2.imread(os.path.join(path, img))
+            pic = cv2.cvtColor(pic, cv2.COLOR_BGR2GRAY)
+            pic = cv2.resize(pic, (80, 80))
+            x_data.append([pic])
+    return x_data
 
-# Converts to categorical data (one-hot encoding)
-y_train = to_categorical(y_train)
-y_test = to_categorical(y_test)
+# Function to save and load numpy arrays
+def save_and_load_np_array(data, path, file_name):
+    np.save(os.path.join(path, file_name), np.array(data))
+    return np.load(os.path.join(path, file_name))
 
-# Establish image shapes according to data sizes
-N_in = np.shape(x_train)[-2]
-N_channel = np.shape(x_train)[-1]
+# CNN Model Creation
+def create_cnn_model(input_shape):
+    model = tf.keras.Sequential([
+        tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+        tf.keras.layers.MaxPooling2D((2, 2)),
+        tf.keras.layers.Flatten(),
+        tf.keras.layers.Dense(128, activation='relu'),
+        tf.keras.layers.Dense(2, activation='softmax')
+    ])
+    return model
 
-# Create a CNN model
-model = tf.keras.Sequential()
-model.add(Conv2D(32, (3, 3), activation='relu', input_shape=(N_in, N_in, N_channel)))
-model.add(MaxPooling2D((2, 2)))
-model.add(Conv2D(64, (3, 3), activation='relu'))
-model.add(MaxPooling2D((2, 2)))
-model.add(Conv2D(128, (3, 3), activation='relu'))
-model.add(MaxPooling2D((2, 2)))
-model.add(Flatten())
-model.add(Dense(128, activation='relu'))
-model.add(Dense(2, activation='softmax'))  # Use softmax for multi-class classification
+# Training Function
+def train_model(path_1, path_0):
+    x_data_1 = load_and_process_images(path_1)
+    x_data_0 = load_and_process_images(path_0)
 
-# Define an optimizer
-optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    x_data_1_np = save_and_load_np_array(x_data_1, path_1, 'features.npy')
+    x_data_0_np = save_and_load_np_array(x_data_0, path_0, 'features.npy')
 
-model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+    x_data = np.concatenate((x_data_1_np, x_data_0_np), axis=0)
+    x_data = x_data.reshape(x_data.shape[0], x_data.shape[-1], x_data.shape[-1], 1)
 
-# Fit the model
-history = model.fit(x=x_train, y=y_train, batch_size=16, epochs=20, verbose=1,
-                    validation_data=(x_test, y_test))
+    y_data_1 = np.ones(np.shape(x_data_1)[0])
+    y_data_0 = np.zeros(np.shape(x_data_0)[0])
+    y_data = np.concatenate((y_data_1, y_data_0), axis=0)
 
-# Evaluate the model
-results = model.evaluate(x_test, y_test, batch_size=16)
-print("Test loss, Test accuracy:", results)
+    x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=42)
+
+    y_train = to_categorical(y_train)
+    y_test = to_categorical(y_test)
+
+    N_in = np.shape(x_train)[-2]
+    N_channel = np.shape(x_train)[-1]
+    model = create_cnn_model((N_in, N_in, N_channel))
+    optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
+    model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
+
+    history = model.fit(x_train, y_train, batch_size=16, epochs=20, verbose=1, validation_data=(x_test, y_test))
+
+    results = model.evaluate(x_test, y_test, batch_size=16)
+    print("Test loss, Test accuracy:", results)
+
+    return model, history
+
+# Function for predicting on a single image
+def predict_image(model, image_path, image_size=(80, 80)):
+    img = cv2.imread(image_path)
+    img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
+    img = cv2.resize(img, image_size)
+    img = img.reshape(1, image_size[0], image_size[1], 1)
+    img = img / 255.0
+
+    prediction = model.predict(img)
+    predicted_class = np.argmax(prediction, axis=1)
+    return predicted_class
