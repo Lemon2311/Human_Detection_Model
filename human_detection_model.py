@@ -36,34 +36,46 @@ def create_cnn_model(input_shape):
     ])
     return model
 
-# Training Function
-def train_model(path_1, path_0):
-    x_data_1 = load_and_process_images(path_1)
-    x_data_0 = load_and_process_images(path_0)
+# Training Function modified to take input folder as an argument containing as many datasets as we want
+def train_model(input_folder):
+    x_data_list = []
+    y_data_list = []
 
-    x_data_1_np = save_and_load_np_array(x_data_1, path_1, 'features.npy')
-    x_data_0_np = save_and_load_np_array(x_data_0, path_0, 'features.npy')
+    # List all the subdirectories in the input folder
+    classes = [d for d in os.listdir(input_folder) if os.path.isdir(os.path.join(input_folder, d))]
+    class_labels = {class_name: idx for idx, class_name in enumerate(classes)}
 
-    x_data = np.concatenate((x_data_1_np, x_data_0_np), axis=0)
-    x_data = x_data.reshape(x_data.shape[0], x_data.shape[-1], x_data.shape[-1], 1)
+    for class_name, idx in class_labels.items():
+        class_path = os.path.join(input_folder, class_name)
+        x_data = load_and_process_images(class_path)
+        x_data_np = save_and_load_np_array(x_data, class_path, 'features.npy')
 
-    y_data_1 = np.ones(np.shape(x_data_1)[0])
-    y_data_0 = np.zeros(np.shape(x_data_0)[0])
-    y_data = np.concatenate((y_data_1, y_data_0), axis=0)
+        x_data_list.append(x_data_np)
+        y_data_list.append(np.full(len(x_data_np), idx))
 
+    # Concatenate the data and labels
+    x_data = np.concatenate(x_data_list, axis=0)
+    y_data = np.concatenate(y_data_list, axis=0)
+
+    # Prepare the data for training
+    x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], x_data.shape[2], 1)  # Reshape if necessary
+    y_data = to_categorical(y_data)
+
+    # Split into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=42)
 
-    y_train = to_categorical(y_train)
-    y_test = to_categorical(y_test)
+    # Create the CNN model
+    input_shape = x_train.shape[1:]
+    model = create_cnn_model(input_shape)
 
-    N_in = np.shape(x_train)[-2]
-    N_channel = np.shape(x_train)[-1]
-    model = create_cnn_model((N_in, N_in, N_channel))
+    # Compile the model
     optimizer = tf.keras.optimizers.Adam(learning_rate=0.001)
     model.compile(optimizer=optimizer, loss='categorical_crossentropy', metrics=['accuracy'])
 
+    # Train the model
     history = model.fit(x_train, y_train, batch_size=16, epochs=20, verbose=1, validation_data=(x_test, y_test))
 
+    # Evaluate the model
     results = model.evaluate(x_test, y_test, batch_size=16)
     print("Test loss, Test accuracy:", results)
 
