@@ -92,3 +92,57 @@ def predict_image(model, image_path, image_size=(80, 80)):
     prediction = model.predict(img)
     predicted_class = np.argmax(prediction, axis=1)
     return predicted_class
+
+#Example usage:
+def example():
+    # Step 2: Processing and Loading Images
+    # Process images for each category
+    cat_images = load_and_process_images('data/cats')
+    dog_images = load_and_process_images('data/dogs')
+
+    # Step 3: Saving and Loading Processed Data
+    # Save processed images and load them back
+    save_and_load_np_array(cat_images, 'processed_data', 'cat_images.npy')
+    save_and_load_np_array(dog_images, 'processed_data', 'dog_images.npy')
+
+    # Step 4: Creating and Training the Model
+    # Train the model using the data in 'processed_data' folder
+    model, history = train_model('processed_data')
+
+    # Optionally, plot the training history
+    plot_training_history(history)
+
+    # Save your model
+    model.save('my_model.h5')
+
+    # Step 5: Predicting on a New Image
+    # Let's say you have a new image called 'new_image.png'
+    new_image_class = predict_image(model, 'path/to/new_image.png')
+
+    # Print the predicted class
+    print("Predicted class:", "Cat" if new_image_class[0] == 0 else "Dog")
+
+# Plot training history
+import matplotlib.pyplot as plt
+
+def plot_training_history(history):
+    # Plot training & validation accuracy
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(history.history['accuracy'])
+    plt.plot(history.history['val_accuracy'])
+    plt.title('Model Accuracy')
+    plt.ylabel('Accuracy')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'], loc='upper left')
+
+    # Plot training & validation loss
+    plt.subplot(1, 2, 2)
+    plt.plot(history.history['loss'])
+    plt.plot(history.history['val_loss'])
+    plt.title('Model Loss')
+    plt.ylabel('Loss')
+    plt.xlabel('Epoch')
+    plt.legend(['Train', 'Validation'], loc='upper left')
+
+    plt.show()
