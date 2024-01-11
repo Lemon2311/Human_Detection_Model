@@ -97,13 +97,11 @@ def predict_image(model, image_path, image_size=(80, 80)):
 def example():
     # Step 2: Processing and Loading Images
     # Process images for each category
-    cat_images = load_and_process_images('data/cats')
-    dog_images = load_and_process_images('data/dogs')
+    person_images = load_and_process_images('data/person')
 
     # Step 3: Saving and Loading Processed Data
     # Save processed images and load them back
-    save_and_load_np_array(cat_images, 'processed_data', 'cat_images.npy')
-    save_and_load_np_array(dog_images, 'processed_data', 'dog_images.npy')
+    save_and_load_np_array(person_images, 'processed_data', 'person_images.npy')
 
     # Step 4: Creating and Training the Model
     # Train the model using the data in 'processed_data' folder
@@ -120,7 +118,7 @@ def example():
     new_image_class = predict_image(model, 'path/to/new_image.png')
 
     # Print the predicted class
-    print("Predicted class:", "Cat" if new_image_class[0] == 0 else "Dog")
+    print("Predicted class:", 0 if new_image_class[0] == 0 else 1)
 
 # Plot training history
 import matplotlib.pyplot as plt
