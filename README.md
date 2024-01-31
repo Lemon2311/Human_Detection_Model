@@ -1,8 +1,8 @@
-# Human Detection Model with Nvidia Jetson Nano
+# Human Detection Model
 
 ## Overview
 
-This project aims to implement a robust human detection model on the Nvidia Jetson Nano. The primary goal is to create an artificial intelligence algorithm that can accurately detect the presence of humans in images captured by the device's built-in camera. This model is a key component of a larger robotics project, specifically a semi-autonomous vacuum designed to collaborate safely with humans.
+This is a simple ai model that should return either 0 or 1 if people are detected into a picture. The aim is to later implement it on a Nvidia Jetson, Nano or Xavier. The primary goal is to create an artificial intelligence algorithm that can accurately detect the presence of humans in images captured by a raspberry pi camera added to the Jetson. This model is a key component of a larger robotics project, specifically a semi-autonomous vacuum designed to collaborate safely with humans.
 
 ## Software Requirements
 
@@ -22,7 +22,7 @@ Ensure you have the following software installed before running the project:
 
 ## TensorFlow Integration
 
-- Leverages the TensorFlow library for implementing the Convolutional Neural Network (CNN).
+- Leverages the TensorFlow library for implementing a Convolutional Neural Network (CNN).
 - Utilizes TensorFlow's high-level Keras API for building and training neural networks.
 - Compiles the model using the Adam optimizer and categorical cross-entropy loss function.
 
@@ -53,19 +53,16 @@ Visit the [GitHub repository](https://github.com/Lemon2311/Human_Detection_Model
 1. Locate the downloaded ZIP file on your computer.
 2. Extract the contents using a tool like WinRAR or by using the command:
 
-## Step 4: Capture an Image
-```bash
-python take_photo.py
-```
-
-## Step 5: Train the Model
+## Step 4: Run the model
+Runnning the model is as easy as calling
 ```bash
 python main.py
 ```
-## Step 6: Evaluate the Model
-After training, the model is automatically evaluated on a test dataset to assess its performance.
 
-## Step 7: View Results
-Explore the 'capture' folder to view the captured images and assess the model's effectiveness in detecting humans.
-
-## Step 8: Enjoy!
+## Step 5: Training the Model
+If needed the model can be trained more on a custom dataset by running
+```bash
+python train.py
+```
+<br><br><br>
+More details will be added to the readMe as the project progresses, right now info might be incomplete.
