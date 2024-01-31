@@ -15,7 +15,7 @@ Ensure you have the following software installed before running the project:
 
 ## Image Capture
 
-- Captures a single frame from the camera connected to the Nvidia Jetson.
+- Captures a single frame from the camera connected to the device onto which the model is ran.
 - Utilizes the `take_photo.py` module.
 - Saves captured images in the 'capture' folder.
 - Webcam resources are released after capturing.
