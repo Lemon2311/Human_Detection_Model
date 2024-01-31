@@ -15,7 +15,7 @@ Ensure you have the following software installed before running the project:
 
 ## Image Capture
 
-- Captures a single frame from Nvidia Jetson Nano's built-in webcam.
+- Captures a single frame from the camera connected to the Nvidia Jetson.
 - Utilizes the `take_photo.py` module.
 - Saves captured images in the 'capture' folder.
 - Webcam resources are released after capturing.
