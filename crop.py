@@ -36,4 +36,4 @@ def crop_and_save_images(input_folder, output_folder, target_size):
             print(f"Error processing {filename}: {e}")
 
 # Example usage:
-crop_and_save_images("input_photos", "output_photos", 700)#input_folder, output_folder, target_size
+#crop_and_save_images("capture", "cropped", 700)#input_folder, output_folder, target_size
