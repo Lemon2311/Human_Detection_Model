@@ -7,3 +7,4 @@ after installing run:
 ```bash
 python yolo.py
 ```
+* Note: This code can be used on most devices that have a camera connected like a laptop or pc, as long as the camera is connected as source 0
