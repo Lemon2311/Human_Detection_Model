@@ -5,6 +5,11 @@ from tensorflow.keras.utils import to_categorical
 from sklearn.model_selection import train_test_split
 import tensorflow as tf
 
+def define_paths():
+    path_home = "C:\\Users\\th2ke\\Music\\EXPO\\Human_Detection_Model-master\\Converted_Data"
+    path_1 = os.path.join(path_home, '1')
+    path_0 = os.path.join(path_home, '0')
+    return path_home, path_1, path_0
 # Function to process and load images
 def load_and_process_images(path):
     x_data = [] 
@@ -23,17 +28,19 @@ def save_and_load_np_array(data, path, file_name):
 
 # CNN Model Creation
 def create_cnn_model(input_shape):
+# Change the output layer to have 1 node and 'sigmoid' activation
     model = tf.keras.Sequential([
-        tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
-        tf.keras.layers.MaxPooling2D((2, 2)),
-        tf.keras.layers.Flatten(),
-        tf.keras.layers.Dense(128, activation='relu'),
-        tf.keras.layers.Dense(2, activation='softmax')
-    ])
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=input_shape),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D((2, 2)),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(128, activation='relu'),
+    tf.keras.layers.Dense(1, activation='sigmoid')  # Change the number of nodes to 1 and use 'sigmoid' activation
+])
+
     return model
 
 # Training Function modified to take input folder as an argument containing as many datasets as we want
@@ -53,14 +60,29 @@ def train_model(input_folder):
         x_data_list.append(x_data_np)
         y_data_list.append(np.full(len(x_data_np), idx))
 
-    # Concatenate the data and labels
-    x_data = np.concatenate(x_data_list, axis=0)
-    y_data = np.concatenate(y_data_list, axis=0)
 
-    # Prepare the data for training
-    x_data = x_data.reshape(x_data.shape[0], x_data.shape[1], x_data.shape[2], 1)  # Reshape if necessary
-    y_data = to_categorical(y_data)
-
+    # Define paths
+    path_home, path_1, path_0 = define_paths()
+    
+    # Load and process images for class 1 (humans)
+    x_data_1_np = load_and_process_images(path_1)
+    
+    # Load and process images for class 0 (non-humans)
+    x_data_0_np = load_and_process_images(path_0)
+    
+    # Visualize an image from x_data_1_np (optional)
+    #plt.imshow(x_data_1_np[0][:, :, 0])
+    #plt.show()
+    
+    # Concatenate images with humans and images without humans
+    x_data = np.concatenate((x_data_1_np, x_data_0_np), axis=0)
+    x_data = x_data.reshape(x_data.shape[0], x_data.shape[-1], x_data.shape[-1], 1)
+    
+    # Generate labels (1 = Humans, 0 = Non-humans)
+    y_data_1 = np.ones(np.shape(x_data_1_np)[0])
+    y_data_0 = np.zeros(np.shape(x_data_0_np)[0])
+    y_data = np.concatenate((y_data_1, y_data_0), axis=0)
+    
     # Split into training and testing sets
     x_train, x_test, y_train, y_test = train_test_split(x_data, y_data, test_size=0.2, random_state=42)
 

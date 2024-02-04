@@ -1,4 +1,6 @@
-from human_detection_model import train_model, load_and_process_images, save_and_load_np_array, plot_training_history
+from human_detection_model import os, define_paths, train_model, load_and_process_images, save_and_load_np_array, plot_training_history
+
+path_home, path_1, path_0 = define_paths()
 
 person_images = load_and_process_images('data')
 
