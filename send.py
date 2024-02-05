@@ -3,8 +3,8 @@ import requests
 import numpy as np
 import time
 
-upload_url = "http://localhost:5000/upload"
-image_url = 'http://localhost:5000/image'
+upload_url = "http://192.168.1.239:5000/upload"
+image_url = 'http://192.168.1.239:5000/image'
 
 def fetch_and_display_image(image_url):
     response = requests.get(image_url, stream=True)
