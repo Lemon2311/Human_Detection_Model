@@ -3,8 +3,12 @@ import requests
 import numpy as np
 import time
 
-upload_url = "http://localhost:5000/upload"
-image_url = 'http://localhost:5000/image'
+url='http://192.168.1.239:5000'
+upload_url = url+'/upload'
+image_url = url+'/image'
+hdm_url = url+'/hdm'
+
+useModel='yolo' #yolo or hdm
 
 def fetch_and_display_image(image_url):
     response = requests.get(image_url, stream=True)
@@ -34,11 +38,18 @@ while True:
     # Convert to bytes and send as part of a multipart/form-data request
     img_bytes = buffer.tobytes()
     files = {'image': ('image.jpg', img_bytes, 'image/jpeg')}
-    response = requests.post(upload_url, files=files)
-    print(f"Image sent, server response: {response.text}")
+    
+    if(useModel=='yolo'):
+        response = requests.post(upload_url, files=files)
+        print(f"Image sent, server response: {response.text}")
 
-    # Fetch and display the image from the server
-    fetch_and_display_image(image_url)
+        # Fetch and display the image from the server
+        fetch_and_display_image(image_url)
+        
+    else:
+        response = requests.post(hdm_url, files=files)
+        print(f"Image sent, server response: {response.text}")
+
 
     # Break the loop when 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):

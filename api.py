@@ -6,6 +6,8 @@ import cv2
 
 from ultralytics import YOLO
 
+from main import run
+
 # Load a pretrained YOLOv8n model
 model = YOLO('yolov8n.pt') 
 
@@ -35,6 +37,8 @@ IMAGES_DIR = "./"
 if not os.path.exists(IMAGES_DIR):
     os.makedirs(IMAGES_DIR)
 
+#yolo endpoints
+
 @app.route('/upload', methods=['POST'])
 def upload_image():
     if 'image' not in request.files:
@@ -61,5 +65,29 @@ def get_image():
     except FileNotFoundError:
         return "Image not found", 404
 
+#our model endpoints
+    
+@app.route('/hdm', methods=['POST'])
+def upload_image():
+    if 'image' not in request.files:
+        return "No image part", 400
+    file = request.files['image']
+    if file.filename == '':
+        return "No selected file", 400
+    if file:
+        # Run inference on the source
+        # You might want to add a more secure way to save files
+        # For example, validating filenames or generating a unique name for each file
+        filepath = os.path.join(IMAGES_DIR, file.filename)
+        file.save(filepath)
+        results = run(file.filename) #classes=0 if only people recog is desired
+
+        return results
+
+
+
+
 if __name__ == '__main__':
     app.run(debug=True)
+
+
