@@ -8,7 +8,7 @@ upload_url = url+'/upload'
 image_url = url+'/image'
 hdm_url = url+'/hdm'
 
-useModel='yolo' #yolo or hdm
+useModel='yolo'
 
 def fetch_and_display_image(image_url):
     response = requests.get(image_url, stream=True)
@@ -45,10 +45,6 @@ while True:
 
         # Fetch and display the image from the server
         fetch_and_display_image(image_url)
-        
-    else:
-        response = requests.post(hdm_url, files=files)
-        print(f"Image sent, server response: {response.text}")
 
 
     # Break the loop when 'q' is pressed
