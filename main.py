@@ -11,6 +11,6 @@ def run(path):
 
     new_image_class = predict_image(loaded_model, path)
     # Print the predicted class
-    return new_image_class
+    return "Not a Person" if new_image_class[0] == 0 else "Person"
 
 # example: run('capture/image2.jpg')
