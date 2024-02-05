@@ -1,5 +1,4 @@
 from tensorflow.keras.models import load_model
-from take_photo import capture_photo
 from human_detection_model import predict_image
 
 def run(path):
