@@ -68,7 +68,7 @@ def get_image():
 #our model endpoints
     
 @app.route('/hdm', methods=['POST'])
-def upload_image():
+def hdm():
     if 'image' not in request.files:
         return "No image part", 400
     file = request.files['image']
